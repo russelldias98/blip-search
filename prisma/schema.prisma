@@ -1,0 +1,22 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  extensions        = [vector]
+  shadowDatabaseUrl = env("DATABASE_URL_SHADOW")
+}
+
+model Training {
+  id         String                       @id @default(cuid())
+  question   String                       @default("")
+  answer     String                       @default("")
+  hash       String                       @default("")
+  tokenCount Int                          @default(0)
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+  updatedAt  DateTime                     @updatedAt
+}
