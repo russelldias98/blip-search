@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { clsx } from 'clsx'
 import Providers from '@/components/Providers'
+import React from 'react'
+import { clsx } from 'clsx'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,12 +18,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <Providers>
-        <body className={clsx(inter.className, 'h-full w-full max-w-7xl p-20 bg-gray-50 mx-auto')}>
-          {children}
-        </body>
-      </Providers>
-    </html>
+    <Providers>
+      <html lang="en" className="min-h-screen h-full max-w-5xl mx-auto p-14 bg-gray-50">
+        <body className={clsx(inter.className, 'h-full')}>{children}</body>
+      </html>
+    </Providers>
   )
 }

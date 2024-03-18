@@ -38,7 +38,7 @@ const ExampleItem: React.FC<Props> = ({ content }) => {
   return (
     <div
       onClick={handleClick}
-      className="group cursor-pointer flex items-center space-x-2 hover:bg-purple-100 transition-all duration-100 p-2 rounded-lg"
+      className="group cursor-pointer flex items-center space-x-2 hover:bg-purple-100 transition-all duration-100 p-1 rounded-lg"
     >
       <div className="transition-all duration-100 bg-purple-100 group-hover:bg-purple-200 w-fit p-2 rounded-full">
         <Sparkle className="h-4 w-4 text-purple-900" />
