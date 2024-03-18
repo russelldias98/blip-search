@@ -19,11 +19,18 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { PanelBottomOpen } from 'lucide-react'
-import { TRAINING_DATA } from '@/config/constants'
+import { useQuery } from '@tanstack/react-query'
+import { getTrainingData } from '@/handlers/GET'
+import { TableLoader } from '@/modules/TableLoader'
 
 interface Props {}
 
 const TrainingData: React.FC<Props> = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['training-data'],
+    queryFn: getTrainingData,
+  })
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -40,22 +47,26 @@ const TrainingData: React.FC<Props> = () => {
             free to pick questions from the list below or ask your own questions.
           </SheetDescription>
         </SheetHeader>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Question</TableHead>
-              <TableHead>Answer</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {TRAINING_DATA.map((item) => (
-              <TableRow key={item.question}>
-                <TableCell className="font-medium">{item.question}</TableCell>
-                <TableCell>{item.answer}</TableCell>
+        {isLoading ? (
+          <TableLoader />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Question</TableHead>
+                <TableHead>Answer</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data?.data.data.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.question}</TableCell>
+                  <TableCell>{item.answer}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </SheetContent>
     </Sheet>
   )

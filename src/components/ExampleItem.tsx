@@ -5,18 +5,31 @@ import { Sparkle } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { postPrompt } from '@/handlers/POST'
 import { useStore } from '@/store'
+import { useToast } from '@/components/ui/use-toast'
 
 interface Props {
   content: string
 }
 
 const ExampleItem: React.FC<Props> = ({ content }) => {
-  const mutation = useMutation({
-    mutationFn: postPrompt,
-  })
-
+  const { toast } = useToast()
   const setLoadingAndAddUserMessage = useStore((state) => state.setLoadingAndAddUserMessage)
   const removeLoadingAndAddAIMessage = useStore((state) => state.removeLoadingAndAddAIMessage)
+  const setIsLoading = useStore((state) => state.setIsLoading)
+
+  const mutation = useMutation({
+    mutationFn: postPrompt,
+    onError: () => {
+      console.log('error')
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request.',
+      })
+      setIsLoading(false)
+    },
+  })
+
   const handleClick = async () => {
     try {
       setLoadingAndAddUserMessage({

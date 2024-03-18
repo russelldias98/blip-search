@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { clsx } from 'clsx'
+import { useToast } from '@/components/ui/use-toast'
 
 interface Props {}
 
@@ -27,12 +28,24 @@ const formSchema = z.object({
 })
 
 const ChatInput: React.FC<Props> = () => {
+  const { toast } = useToast()
+
   const setLoadingAndAddUserMessage = useStore((state) => state.setLoadingAndAddUserMessage)
   const removeLoadingAndAddAIMessage = useStore((state) => state.removeLoadingAndAddAIMessage)
   const isLoading = useStore((state) => state.isLoading)
+  const setIsLoading = useStore((state) => state.setIsLoading)
 
   const mutation = useMutation({
     mutationFn: postPrompt,
+    onError: () => {
+      console.log('error')
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request.',
+      })
+      setIsLoading(false)
+    },
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,18 +56,22 @@ const ChatInput: React.FC<Props> = () => {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    form.reset()
-    setLoadingAndAddUserMessage({
-      content: values.prompt,
-      timestamp: new Date().toISOString(),
-      isUser: true,
-    })
-    const response = await mutation.mutateAsync(values.prompt)
-    removeLoadingAndAddAIMessage({
-      content: response.data.data.answer,
-      timestamp: response.data.data.createdAt,
-      isUser: false,
-    })
+    try {
+      form.reset()
+      setLoadingAndAddUserMessage({
+        content: values.prompt,
+        timestamp: new Date().toISOString(),
+        isUser: true,
+      })
+      const response = await mutation.mutateAsync(values.prompt)
+      removeLoadingAndAddAIMessage({
+        content: response.data.data.answer,
+        timestamp: response.data.data.createdAt,
+        isUser: false,
+      })
+    } catch (e) {
+      console.error({ e })
+    }
   }
 
   return (

@@ -6,53 +6,79 @@ import { trainingData } from '@/app/api/train/types'
 import { prisma } from '@/config/prisma'
 
 export async function POST(request: Request) {
-  const body = await request.json()
-  // Validate body
-  const validated = await trainingData.parseAsync(body)
-  for await (const item of validated) {
-    try {
-      // Generate hash of question + answer
-      const hashDigest = generateHash(item.question, item.answer)
+  try {
+    const body = await request.json()
+    // Validate body
+    const validated = await trainingData.parseAsync(body)
+    for await (const item of validated) {
+      try {
+        // Generate hash of question + answer
+        const hashDigest = generateHash(item.question, item.answer)
 
-      // Generate embedding
-      const embedding = await openaiClient.embeddings.create({
-        input: cleanString(item.answer),
-        model: GPT_EMBEDDING_MODEL,
-      })
+        // Generate embedding
+        const embedding = await openaiClient.embeddings.create({
+          input: cleanString(item.answer),
+          model: GPT_EMBEDDING_MODEL,
+        })
 
-      // Save to db
-      const vector = pgvector.toSql(embedding.data[0].embedding)
-      const createdItem = await prisma.training.create({
-        data: {
-          question: cleanString(item.question),
-          answer: cleanString(item.answer),
-          hash: hashDigest,
-          tokenCount: embedding.usage.total_tokens,
-        },
-      })
-      // Update the embedding because we need to store it as a vector
-      await prisma.$executeRaw`UPDATE "Training" SET embedding = ${vector}::vector WHERE id = ${createdItem.id};`
-    } catch (e) {
-      console.error(e)
-      throw e
+        // Save to db
+        const vector = pgvector.toSql(embedding.data[0].embedding)
+        const createdItem = await prisma.training.create({
+          data: {
+            question: cleanString(item.question),
+            answer: cleanString(item.answer),
+            hash: hashDigest,
+            tokenCount: embedding.usage.total_tokens,
+          },
+        })
+        // Update the embedding because we need to store it as a vector
+        await prisma.$executeRaw`UPDATE "Training" SET embedding = ${vector}::vector WHERE id = ${createdItem.id};`
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
     }
-  }
 
-  return Response.json({
-    success: true,
-  })
+    return Response.json({
+      success: true,
+    })
+  } catch (e: any) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: e.message,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
+  }
 }
 
 export async function GET() {
-  const data = await prisma.training.findMany({
-    select: {
-      id: true,
-      answer: true,
-      question: true,
-    },
-  })
-  return Response.json({
-    success: true,
-    data,
-  })
+  try {
+    const data = await prisma.training.findMany({
+      select: {
+        id: true,
+        answer: true,
+        question: true,
+      },
+    })
+    return Response.json({
+      success: true,
+      data,
+    })
+  } catch (e: any) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: e.message,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
+  }
 }

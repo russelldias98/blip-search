@@ -1,6 +1,7 @@
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { Sparkle, User } from 'lucide-react'
+import { clsx } from 'clsx'
 interface Props {
   isUser: boolean
   content: string
@@ -21,7 +22,7 @@ const ChatItem: React.FC<Props> = ({ content, timestamp, isUser }) => {
           </div>
         )}
       </div>
-      <div className="bg-gray-100 py-2 px-3 rounded-lg">
+      <div className={clsx('py-2 px-3 rounded-lg', isUser ? 'bg-gray-50' : 'bg-gray-100')}>
         <p>{content}</p>
         <span className="text-xs text-muted-foreground">{formatDistanceToNow(timestamp)}</span>
       </div>

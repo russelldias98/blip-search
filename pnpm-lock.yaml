@@ -10,6 +10,7 @@ specifiers:
   '@radix-ui/react-scroll-area': ^1.0.5
   '@radix-ui/react-slot': ^1.0.2
   '@radix-ui/react-tabs': ^1.0.4
+  '@radix-ui/react-toast': ^1.1.5
   '@tanstack/react-query': ^5.28.4
   '@tanstack/react-table': ^8.13.2
   '@types/crypto-js': ^4.2.2
@@ -52,6 +53,7 @@ dependencies:
   '@radix-ui/react-scroll-area': 1.0.5_ld7sbgvxv7chdldgh56kfhlrdq
   '@radix-ui/react-slot': 1.0.2_uo4fmizy6e3vavmbwiahqshsb4
   '@radix-ui/react-tabs': 1.0.4_ld7sbgvxv7chdldgh56kfhlrdq
+  '@radix-ui/react-toast': 1.1.5_ld7sbgvxv7chdldgh56kfhlrdq
   '@tanstack/react-query': 5.28.4_react@18.2.0
   '@tanstack/react-table': 8.13.2_biqbaboplfbrettd7655fr4n2y
   ai: 3.0.7_react@18.2.0+zod@3.22.4
@@ -711,6 +713,38 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
+  /@radix-ui/react-toast/1.1.5_ld7sbgvxv7chdldgh56kfhlrdq:
+    resolution: {integrity: sha512-fRLn227WHIBRSzuRzGJ8W+5YALxofH23y0MlPLddaIpLpCDqdE0NZlS2NRQDRiptfxDeeCjgFIpexB1/zkxDlw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.0
+      '@radix-ui/primitive': 1.0.1
+      '@radix-ui/react-collection': 1.0.3_ld7sbgvxv7chdldgh56kfhlrdq
+      '@radix-ui/react-compose-refs': 1.0.1_uo4fmizy6e3vavmbwiahqshsb4
+      '@radix-ui/react-context': 1.0.1_uo4fmizy6e3vavmbwiahqshsb4
+      '@radix-ui/react-dismissable-layer': 1.0.5_ld7sbgvxv7chdldgh56kfhlrdq
+      '@radix-ui/react-portal': 1.0.4_ld7sbgvxv7chdldgh56kfhlrdq
+      '@radix-ui/react-presence': 1.0.1_ld7sbgvxv7chdldgh56kfhlrdq
+      '@radix-ui/react-primitive': 1.0.3_ld7sbgvxv7chdldgh56kfhlrdq
+      '@radix-ui/react-use-callback-ref': 1.0.1_uo4fmizy6e3vavmbwiahqshsb4
+      '@radix-ui/react-use-controllable-state': 1.0.1_uo4fmizy6e3vavmbwiahqshsb4
+      '@radix-ui/react-use-layout-effect': 1.0.1_uo4fmizy6e3vavmbwiahqshsb4
+      '@radix-ui/react-visually-hidden': 1.0.3_ld7sbgvxv7chdldgh56kfhlrdq
+      '@types/react': 18.2.64
+      '@types/react-dom': 18.2.21
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /@radix-ui/react-use-callback-ref/1.0.1_uo4fmizy6e3vavmbwiahqshsb4:
     resolution: {integrity: sha512-D94LjX4Sp0xJFVaoQOd3OO9k7tpBYNOXdVhkltUbGv2Qb9OXdrg/CpsjlZv7ia14Sylv398LswWBVVu5nqKzAQ==}
     peerDependencies:
@@ -767,6 +801,27 @@ packages:
       '@babel/runtime': 7.24.0
       '@types/react': 18.2.64
       react: 18.2.0
+    dev: false
+
+  /@radix-ui/react-visually-hidden/1.0.3_ld7sbgvxv7chdldgh56kfhlrdq:
+    resolution: {integrity: sha512-D4w41yN5YRKtu464TLnByKzMDG/JlMPHtfZgQAu9v6mNakUqGUI9vUrfQKz8NK41VMm/xbZbh76NUTVtIYqOMA==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.0
+      '@radix-ui/react-primitive': 1.0.3_ld7sbgvxv7chdldgh56kfhlrdq
+      '@types/react': 18.2.64
+      '@types/react-dom': 18.2.21
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@swc/helpers/0.5.2:

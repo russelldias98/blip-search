@@ -1,5 +1,6 @@
 import Chat from '@/modules/Chat'
 import HeaderSection from '@/modules/HeaderSection'
+import React from 'react'
 
 export default function Home() {
   return (

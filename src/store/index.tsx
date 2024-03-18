@@ -10,6 +10,7 @@ interface Message {
 type CounterState = {
   setLoadingAndAddUserMessage: (message: Message) => void
   removeLoadingAndAddAIMessage: (message: Message) => void
+  setIsLoading: (isLoading: boolean) => void
   messages: Message[]
   isLoading: boolean
 }
@@ -29,4 +30,5 @@ export const useStore = create<CounterState>((set) => ({
       messages: [...state.messages, message],
       isLoading: false,
     })),
+  setIsLoading: (isLoading) => set({ isLoading }),
 }))
