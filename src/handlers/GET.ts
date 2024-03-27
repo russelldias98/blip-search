@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
-import { Training } from '@prisma/client'
+import { Document } from '@prisma/client'
 
 /**
  * Sends a POST request to the '/api/prompt' endpoint with the provided prompt.
@@ -12,7 +12,7 @@ import { Training } from '@prisma/client'
 export const getTrainingData = async (): Promise<
   AxiosResponse<{
     success: boolean
-    data: Training[]
+    data: Document[]
   }>
 > => {
   return await axios.get('/api/train')

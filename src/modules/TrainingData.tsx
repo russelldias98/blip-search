@@ -39,7 +39,7 @@ const TrainingData: React.FC<Props> = () => {
           Training Data
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="px-40 pt-10 pb-32 h-2/3 overflow-auto">
+      <SheetContent side="bottom" className="px-40 pt-10 pb-32 h-5/6 overflow-auto">
         <SheetHeader className="mb-8">
           <SheetTitle>Training Data</SheetTitle>
           <SheetDescription>
@@ -53,15 +53,13 @@ const TrainingData: React.FC<Props> = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Question</TableHead>
-                <TableHead>Answer</TableHead>
+                <TableHead>Content</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data?.data.data.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.question}</TableCell>
-                  <TableCell>{item.answer}</TableCell>
+                  <TableCell className="font-medium">{item.content}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

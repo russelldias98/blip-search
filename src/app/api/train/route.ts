@@ -1,84 +1,53 @@
-import openaiClient from '@/config/openai'
-import pgvector from 'pgvector/utils'
-import { GPT_EMBEDDING_MODEL } from '@/config/constants'
-import { cleanString, generateHash } from '@/lib/utils'
 import { trainingData } from '@/app/api/train/types'
-import { prisma } from '@/config/prisma'
+import { db } from '@/config/prisma'
+import vectorStore from '@/config/vectorStore'
+import { SendResponse } from '@/lib/utils'
+import CryptoJS from 'crypto-js'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    // Validate body
     const validated = await trainingData.parseAsync(body)
-    for await (const item of validated) {
-      try {
-        // Generate hash of question + answer
-        const hashDigest = generateHash(item.question, item.answer)
 
-        // Generate embedding
-        const embedding = await openaiClient.embeddings.create({
-          input: cleanString(item.answer),
-          model: GPT_EMBEDDING_MODEL,
-        })
+    const texts = validated.map((text) => ({
+      content: text.content,
+      hash: CryptoJS.SHA256(text.content).toString(),
+    }))
 
-        // Save to db
-        const vector = pgvector.toSql(embedding.data[0].embedding)
-        const createdItem = await prisma.training.create({
-          data: {
-            question: cleanString(item.question),
-            answer: cleanString(item.answer),
-            hash: hashDigest,
-            tokenCount: embedding.usage.total_tokens,
-          },
-        })
-        // Update the embedding because we need to store it as a vector
-        await prisma.$executeRaw`UPDATE "Training" SET embedding = ${vector}::vector WHERE id = ${createdItem.id};`
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    }
+    await vectorStore.addModels(
+      await db.$transaction(
+        texts.map(({ content, hash }) => db.document.create({ data: { content, hash } }))
+      )
+    )
 
-    return Response.json({
+    return SendResponse({
       success: true,
     })
   } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: e.message,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    )
+    return SendResponse({
+      success: true,
+      data: e.message,
+    })
   }
 }
 
 export async function GET() {
   try {
-    const data = await prisma.training.findMany({
+    const trainedData = await db.document.findMany({
       select: {
+        content: true,
         id: true,
-        answer: true,
-        question: true,
       },
     })
-    return Response.json({
+
+    return SendResponse({
       success: true,
-      data,
+      data: trainedData,
     })
   } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: e.message,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    )
+    return SendResponse({
+      success: false,
+      data: e.message,
+    })
   }
 }

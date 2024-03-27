@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { TrainingDataType } from '@/app/api/train/types'
 import CryptoJS from 'crypto-js'
 
 /**
@@ -12,18 +11,6 @@ import CryptoJS from 'crypto-js'
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
-}
-
-/**
- * This function formats an array of training data into a string.
- * Each element in the array is transformed into a string in the format "Q: question \n A: answer".
- * The transformed elements are then joined together with "\n - " in between each element.
- *
- * @param {TrainingDataType} input - The array of training data to be formatted.
- * @returns {string} The formatted string.
- */
-export function formatQsAndAs(input: TrainingDataType) {
-  return input.map((el) => `Q: ${el.question} \n A: ${el.answer}`).join('\n - ')
 }
 
 /**
@@ -47,4 +34,28 @@ export function generateHash(question: string, answer: string): string {
  */
 export function cleanString(input: string): string {
   return input.replace(/\n/g, ' ')
+}
+
+interface SendResponseParams {
+  success: boolean
+  data?: any
+}
+
+/**
+ * Sends a response with the specified success status and data.
+ *
+ * @param success - Indicates whether the response was successful.
+ * @param data - The data to be included in the response.
+ * @returns The JSON response object.
+ */
+export function SendResponse({ success, data }: SendResponseParams) {
+  const responseObj: SendResponseParams = {
+    success,
+  }
+
+  if (data) {
+    responseObj.data = data
+  }
+
+  return Response.json(responseObj)
 }

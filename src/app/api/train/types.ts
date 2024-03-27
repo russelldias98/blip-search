@@ -1,8 +1,7 @@
 import { z } from 'zod'
 
 export const trainingRow = z.object({
-  question: z.string(),
-  answer: z.string(),
+  content: z.string(),
 })
 
 export type TrainingRowType = z.infer<typeof trainingRow>

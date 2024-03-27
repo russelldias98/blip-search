@@ -1,65 +1,55 @@
-import openaiClient from '@/config/openai'
-import { CHAT_PROMPT, GPT_EMBEDDING_MODEL, GPT_MODEL } from '@/config/constants'
-import { prisma } from '@/config/prisma'
-import { Training } from '@prisma/client'
-import pgvector from 'pgvector/utils'
-import { formatQsAndAs } from '@/lib/utils'
+import { bodySchema } from './types'
+import { RunnableSequence } from '@langchain/core/runnables'
+import llm from '@/config/llm'
+import { StringOutputParser } from '@langchain/core/output_parsers'
+import { SendResponse } from '@/lib/utils'
+import { PromptTemplate } from '@langchain/core/prompts'
+import { CHAT_PROMPT } from '@/config/constants'
+import vectorStore from '@/config/vectorStore'
 
-export async function POST(req: Request) {
+/**
+ * Generates a prompt using the CHAT_PROMPT template.
+ * @returns A prompt generated from the CHAT_PROMPT template.
+ */
+export function generatePrompt() {
+  return PromptTemplate.fromTemplate(CHAT_PROMPT)
+}
+
+/**
+ * Retrieves similar pages based on the given prompt.
+ * @param prompt - The prompt to search for similarity.
+ * @returns A string containing the page content of similar pages, separated by newlines.
+ */
+export async function getSimilarity(prompt: string) {
+  const embeddingsResponse = await vectorStore.similaritySearchWithScore(prompt, 1)
+  return embeddingsResponse.map((el) => el[0].pageContent).join('\n')
+}
+
+export async function POST(request: Request) {
   try {
-    const body = await req.json()
+    const body = await request.json()
 
-    // Generate an embedding for the user's prompt
-    const embedding = await openaiClient.embeddings
-      .create({
-        input: body.prompt,
-        model: GPT_EMBEDDING_MODEL,
-      })
-      .then((res) => pgvector.toSql(res.data[0].embedding))
+    const validatedBody = await bodySchema.parseAsync(body)
 
-    // Find the most similar training data to the user's prompt
-    const answers = await prisma.$queryRaw<
-      Training[]
-    >`SELECT id, question, answer, 1 - (embedding <=> ${embedding}::vector) AS similarity FROM "Training" WHERE 1 - (embedding <=> ${embedding}::vector) > 0.8 ORDER BY embedding <=> ${embedding}::vector LIMIT 2;`
+    const context = await getSimilarity(validatedBody.prompt)
 
-    // Ask OpenAI for a response
-    const response = await openaiClient.chat.completions.create({
-      model: GPT_MODEL,
-      messages: [
-        {
-          role: 'user',
-          content: `${CHAT_PROMPT} ${formatQsAndAs(answers)}`,
-        },
-        {
-          role: 'user',
-          content: body.prompt,
-        },
-      ],
+    const prompt = generatePrompt()
+
+    const chain = RunnableSequence.from([prompt, llm, new StringOutputParser()])
+
+    const response = await chain.invoke({ context })
+
+    return SendResponse({
+      success: true,
+      data: {
+        answer: response,
+        createdAt: new Date().toISOString(),
+      },
     })
-
-    // Format the response and return it
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: {
-          answer: response.choices[0].message.content,
-          createdAt: new Date().toISOString(),
-        },
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
   } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: e.message,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    )
+    return SendResponse({
+      success: false,
+      data: e.message,
+    })
   }
 }
