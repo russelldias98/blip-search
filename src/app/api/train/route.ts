@@ -33,12 +33,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const trainedData = await db.document.findMany({
-      select: {
-        content: true,
-        id: true,
-      },
-    })
+    const trainedData = await db.document.findMany()
 
     return SendResponse({
       success: true,

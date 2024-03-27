@@ -11,7 +11,7 @@ import vectorStore from '@/config/vectorStore'
  * Generates a prompt using the CHAT_PROMPT template.
  * @returns A prompt generated from the CHAT_PROMPT template.
  */
-export function generatePrompt() {
+function generatePrompt() {
   return PromptTemplate.fromTemplate(CHAT_PROMPT)
 }
 
@@ -20,7 +20,7 @@ export function generatePrompt() {
  * @param prompt - The prompt to search for similarity.
  * @returns A string containing the page content of similar pages, separated by newlines.
  */
-export async function getSimilarity(prompt: string) {
+async function getSimilarity(prompt: string) {
   const embeddingsResponse = await vectorStore.similaritySearchWithScore(prompt, 1)
   return embeddingsResponse.map((el) => el[0].pageContent).join('\n')
 }
